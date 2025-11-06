@@ -2,14 +2,8 @@ from bs4 import BeautifulSoup
 import requests
 from pymongo import MongoClient
 
-# -------------------------------
-# Step 1: Scrape weather data
-# -------------------------------
-
-# Example webpage (you can replace this URL with a real one)
 url = "https://example.com/daily-weather"
 
-# For demonstration, we’ll simulate a small HTML page
 html_data = """
 <html>
 <body>
@@ -34,9 +28,6 @@ html_data = """
 </html>
 """
 
-# In a real case, you would use:
-# response = requests.get(url)
-# soup = BeautifulSoup(response.text, "html.parser")
 
 soup = BeautifulSoup(html_data, "html.parser")
 
@@ -62,26 +53,16 @@ print("Scraped Weather Data:")
 for record in weather_data:
     print(record)
 
-# -------------------------------
-# Step 2: Store data in MongoDB
-# -------------------------------
 
-# Connect to MongoDB
 client = MongoClient("mongodb://localhost:27017/")
 db = client["weatherDB"]
 collection = db["daily_weather"]
 
-# Clear existing data (for demo)
 collection.delete_many({})
 
-# Insert new scraped data
 collection.insert_many(weather_data)
 
 print("\nData inserted into MongoDB successfully.")
-
-# -------------------------------
-# Step 3: Query temperatures > 35°C
-# -------------------------------
 
 query = {"temperature": {"$gt": 35}}
 hot_days = collection.find(query)
@@ -89,3 +70,433 @@ hot_days = collection.find(query)
 print("\nDays with temperature above 35°C:")
 for day in hot_days:
     print(day)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import requests
+from bs4 import BeautifulSoup
+from pymongo import MongoClient
+
+url = "https://example.com/weather"  # change this
+client = MongoClient("mongodb://localhost:27017/")
+db = client["weatherDB"]
+col = db["daily"]
+
+html = requests.get(url).text
+soup = BeautifulSoup(html, "html.parser")
+
+data = []
+for item in soup.find_all("div", class_="weather"):  # adjust tag/class
+    date = item.find("span", class_="date").text
+    temp = float(item.find("span", class_="temp").text.replace("°C", ""))
+    cond = item.find("span", class_="cond").text
+    data.append({"date": date, "temp": temp, "condition": cond})
+
+col.insert_many(data)
+
+for x in col.find({"temp": {"$gt": 35}}):
+    print(x)

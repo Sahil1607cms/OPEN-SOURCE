@@ -1,20 +1,20 @@
 import pandas as pd
+from pymongo import MongoClient
 
-data = {
-    'employee_id': [1, 2, 3, 4, 5, 6],
-    'name': ['Alice', 'Bob', 'Charlie', 'David', 'Eva', 'Frank'],
-    'department': ['HR', 'Engineering', 'Engineering', 'Marketing', 'HR', 'Marketing'],
-    'salary': [60000, 80000, 85000, 90000, 75000, 88000]
-}
+# Connect to MongoDB
+client = MongoClient("mongodb://localhost:27017/")  
+db = client["companyDB"]        # database name
+collection = db["employees"]    # collection name
 
+data = list(collection.find({}, {"_id": 0})) 
 df = pd.DataFrame(data)
 
-# Step 2: Compute average salary grouped by department
-avg_salary_df = df.groupby('department', as_index=False)['salary'].mean()
+if df.empty:
+    print("No employee records found in the database.")
+else:
+    avg_salary = df.groupby("department")["salary"].mean().reset_index()
 
-# Step 3: Sort by average salary in descending order
-avg_salary_df = avg_salary_df.sort_values(by='salary', ascending=False)
+    avg_salary = avg_salary.sort_values(by="salary", ascending=False)
 
-# Step 4: Display the result
-print("Average Salary by Department (Descending Order):")
-print(avg_salary_df)
+    print("\nAverage Salary by Department (Descending):\n")
+    print(avg_salary)
